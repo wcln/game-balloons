@@ -10,6 +10,11 @@
 var mute = false;
 var FPS = 24;
 
+var questions = [	
+					{question:"5x - 4", answer:"1" , options:["2","3","1","5","4", "6"]}
+				];
+
+
 // constants (set in init function)
 var STAGE_WIDTH;
 var STAGE_HEIGHT;
@@ -31,7 +36,7 @@ var questionCounter;
 
 // text
 var scoreText;
-var questionText;
+var questionText, questionLabelText;
 
 /*
  * Handles initialization of game components
@@ -105,6 +110,7 @@ function initGraphics() {
 	initClouds();
 	initBalloons();
 	initScoreText();
+	initQuestionText();
 
 
 	gameStarted = true;
@@ -118,6 +124,23 @@ function initScoreText() {
 	scoreText.x = 5;
 	scoreText.y = 5;
 	stage.addChild(scoreText);
+}
+
+/*
+ * Adds the question text to the stage
+ */
+function initQuestionText() {
+	// question label (Ex. displays 'Question 1')
+	questionLabelText = new createjs.Text("Question " + (questionCounter + 1), '16px Lato', "white");
+	questionLabelText.x = STAGE_WIDTH/2 - questionLabelText.getMeasuredWidth()/2;
+	questionLabelText.y = 5;
+	stage.addChild(questionLabelText);
+
+	// the actual question
+	questionText = new createjs.Text(questions[questionCounter].question, '36px Lato', "white");
+	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
+	questionText.y = questionLabelText.y + questionLabelText.getMeasuredHeight() + 5;
+	stage.addChild(questionText);
 }
 
 /*
@@ -138,12 +161,19 @@ function initBalloons() {
 		var sprite = balloonSpritesArray[i];
 		sprite.x = 60 + (sprite.getBounds().width + 35) * i;
 		sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
+		sprite.name = questions[questionCounter].options[i];
 		sprite.on("click", function(event) {balloonClickHandler(event);});
 		stage.addChild(sprite);
 
+		// balloon label
+		var label = new createjs.Text(questions[questionCounter].options[i], "36px Lato", "white");
+		label.x = sprite.x + sprite.getBounds().width/2 - label.getMeasuredWidth()/2;
+		label.y = sprite.y + sprite.getBounds().height/2 - label.getMeasuredHeight()/2;
+		stage.addChild(label);
+
 		balloonsArray.push({
 			sprite: sprite,
-			label: 2,
+			label: label,
 			speed: BALLOON_SPEED + Math.random() * 0.7
 		});
 	}
@@ -155,7 +185,7 @@ function initBalloons() {
 function loadBalloonSpriteData(filename) {
 	var spriteData = {
 		images: ["images/" + filename],
-		frames: {width:100, height:115, count:7, regX:0, regY:0, spacing:0, margin:0},
+		frames: {width:100, height:115, count:7, regX:0, regY:0, spacing:5, margin:0},
 		animations: {
 			normal: [0, false],
 			pop: [0, 6, false]
@@ -170,7 +200,36 @@ function loadBalloonSpriteData(filename) {
  * Called when a balloon is clicked
  */
 function balloonClickHandler(event) {
-	alert()
+	var id = event.target.name; // get ID of the balloon that was clicked
+
+	popBalloon(id);
+
+	if (id == questions[questionCounter].answer) { // CORRECT ANSWER
+
+
+
+
+	} else { // INCORRECT ANSWER
+
+
+
+	}
+}
+
+/*
+ * Pops a balloon by performing animation and removing from stage
+ */
+function popBalloon(id) {
+	for (var balloon of balloonsArray) {
+		if (balloon.label.text == id) { // this is the balloon to pop
+			createjs.Tween.get(balloon.sprite).call(function animate() { balloon.sprite.gotoAndPlay("pop"); }).wait(300).call(function remove() { 
+					stage.removeChild(balloon.sprite);
+					stage.removeChild(balloon.label);
+				}
+			);
+			break;
+		}
+	}
 }
 
 /*
@@ -237,7 +296,8 @@ function updateClouds() {
 function updateBalloons() {
 	var resetBalloons = true;
 	for (var balloon of balloonsArray) {
-		balloon.sprite.y-= balloon.speed;
+		balloon.sprite.y -= balloon.speed;
+		balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
 
 		if (balloon.sprite.y + balloon.sprite.getBounds().height > 0) {
 			resetBalloons = false;
@@ -247,6 +307,7 @@ function updateBalloons() {
 		for (var balloon of balloonsArray) {
 			balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
 			balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
+			balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
 		}
 	}
 }

@@ -104,9 +104,20 @@ function initGraphics() {
 
 	initClouds();
 	initBalloons();
+	initScoreText();
 
 
 	gameStarted = true;
+}
+
+/*
+ * Adds the score text to the stage
+ */
+function initScoreText() {
+	scoreText = new createjs.Text("Score: " + score, '20px Lato', "white");
+	scoreText.x = 5;
+	scoreText.y = 5;
+	stage.addChild(scoreText);
 }
 
 /*
@@ -126,13 +137,14 @@ function initBalloons() {
 	for (var i = 0; i < balloonSpritesArray.length; i++) {
 		var sprite = balloonSpritesArray[i];
 		sprite.x = 60 + (sprite.getBounds().width + 35) * i;
-		sprite.y = STAGE_HEIGHT - sprite.getBounds().height;
-		console.log(sprite.y)
+		sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
+		sprite.on("click", function(event) {balloonClickHandler(event);});
 		stage.addChild(sprite);
 
 		balloonsArray.push({
 			sprite: sprite,
-			label: 2
+			label: 2,
+			speed: BALLOON_SPEED + Math.random() * 0.7
 		});
 	}
 }
@@ -152,6 +164,13 @@ function loadBalloonSpriteData(filename) {
 	var sprite = new createjs.Sprite(new createjs.SpriteSheet(spriteData));
 
 	balloonSpritesArray.push(sprite);
+}
+
+/*
+ * Called when a balloon is clicked
+ */
+function balloonClickHandler(event) {
+	alert()
 }
 
 /*
@@ -183,8 +202,7 @@ function initClouds() {
  */
 function updateScore(amount) {
 	score += amount;
-	scoreText.text = "Score:" + score;
-	scoreText.x = sidebarImage.getBounds().width/2 - scoreText.getMeasuredWidth()/2;
+	scoreText.text = "Score: " + score;
 
 	if (amount > 0) {
 		// nice
@@ -217,11 +235,18 @@ function updateClouds() {
  * Updates balloon position
  */
 function updateBalloons() {
+	var resetBalloons = true;
 	for (var balloon of balloonsArray) {
-		balloon.sprite.y-= BALLOON_SPEED;
+		balloon.sprite.y-= balloon.speed;
 
-		if (balloon.sprite.y + balloon.sprite.getBounds().height < 0) {
-			balloon.sprite.y = STAGE_HEIGHT;
+		if (balloon.sprite.y + balloon.sprite.getBounds().height > 0) {
+			resetBalloons = false;
+		}
+	}
+	if (resetBalloons) {
+		for (var balloon of balloonsArray) {
+			balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
+			balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
 		}
 	}
 }

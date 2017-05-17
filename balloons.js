@@ -174,7 +174,8 @@ function initBalloons() {
 		balloonsArray.push({
 			sprite: sprite,
 			label: label,
-			speed: BALLOON_SPEED + Math.random() * 0.7
+			speed: BALLOON_SPEED + Math.random() * 0.7,
+			removed: false
 		});
 	}
 }
@@ -206,12 +207,22 @@ function balloonClickHandler(event) {
 
 	if (id == questions[questionCounter].answer) { // CORRECT ANSWER
 
+		var anyRemoved = false;
+		for (var balloon of balloonsArray) {
+			if (balloon.removed) {
+				anyRemoved = true;
+			}
+		}
 
-
+		if (!anyRemoved) { // first one correct!
+			updateScore(1000);
+		} else { // a balloon has already been popped
+			updateScore(500);
+		}
 
 	} else { // INCORRECT ANSWER
 
-
+		updateScore(-500);
 
 	}
 }
@@ -222,9 +233,14 @@ function balloonClickHandler(event) {
 function popBalloon(id) {
 	for (var balloon of balloonsArray) {
 		if (balloon.label.text == id) { // this is the balloon to pop
-			createjs.Tween.get(balloon.sprite).call(function animate() { balloon.sprite.gotoAndPlay("pop"); }).wait(300).call(function remove() { 
+			createjs.Tween.get(balloon.sprite).call(function animate() { 
+					balloon.sprite.gotoAndPlay("pop"); 
+					playSound("pop");
+				}).wait(300).call(function remove() { 
 					stage.removeChild(balloon.sprite);
 					stage.removeChild(balloon.label);
+					balloon.sprite.y = -100;
+					balloon.removed = true;
 				}
 			);
 			break;
@@ -242,6 +258,7 @@ function initClouds() {
 		tempCloud.y = Math.floor(Math.random() * 400) + 0;
 		tempCloud.scaleX = Math.random() * 1.2 + 0.5;
 		tempCloud.scaleY = tempCloud.scaleX;
+		tempCloud.alpha = 0;
 
 		cloudsArray.push({ // push a cloud object into array
 			image: tempCloud,
@@ -253,6 +270,7 @@ function initClouds() {
 	// add the clouds to the stage
 	for (var cloud of cloudsArray) {
 		stage.addChild(cloud.image);
+		createjs.Tween.get(cloud.image).to({alpha: 1}, 1500); // fade the clouds in
 	}
 }
 
@@ -308,6 +326,13 @@ function updateBalloons() {
 			balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
 			balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
 			balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
+
+			if (balloon.removed) {
+				balloon.removed = false;
+				balloon.sprite.gotoAndPlay("normal");
+				stage.addChild(balloon.sprite);
+				stage.addChild(balloon.label);
+			}
 		}
 	}
 }
@@ -338,6 +363,10 @@ function setupManifest() {
 		{
 			src: "sounds/click.mp3",
 			id: "click"
+		},
+		{
+			src: "sounds/pop.mp3",
+			id: "pop"
 		},
 		{
 			src: "images/background.jpg",

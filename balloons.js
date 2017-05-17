@@ -32,6 +32,7 @@ var balloonSpritesArray = [];
 
 var gameStarted = false;
 var score;
+var scoreLastChangedAmount = 0;
 var questionCounter;
 
 // text
@@ -200,13 +201,14 @@ function loadBalloonSpriteData(filename) {
 /*
  * Called when a balloon is clicked
  */
-function balloonClickHandler(event) {
+async function balloonClickHandler(event) {
 	var id = event.target.name; // get ID of the balloon that was clicked
 
 	popBalloon(id);
 
 	if (id == questions[questionCounter].answer) { // CORRECT ANSWER
 
+		// determine if got first one correct or not
 		var anyRemoved = false;
 		for (var balloon of balloonsArray) {
 			if (balloon.removed) {
@@ -216,9 +218,16 @@ function balloonClickHandler(event) {
 
 		if (!anyRemoved) { // first one correct!
 			updateScore(1000);
+
+
+
 		} else { // a balloon has already been popped
 			updateScore(500);
 		}
+
+		// pop all the other balloons remaining
+		setTimeout(function() { popAllBalloonsExcept(id); }, 500);
+
 
 	} else { // INCORRECT ANSWER
 
@@ -226,6 +235,7 @@ function balloonClickHandler(event) {
 
 	}
 }
+
 
 /*
  * Pops a balloon by performing animation and removing from stage
@@ -236,6 +246,7 @@ function popBalloon(id) {
 			createjs.Tween.get(balloon.sprite).call(function animate() { 
 					balloon.sprite.gotoAndPlay("pop"); 
 					playSound("pop");
+					displayScoreLabel(balloon.sprite.x, balloon.sprite.y);
 				}).wait(300).call(function remove() { 
 					stage.removeChild(balloon.sprite);
 					stage.removeChild(balloon.label);
@@ -244,6 +255,22 @@ function popBalloon(id) {
 				}
 			);
 			break;
+		}
+	}
+}
+
+/*
+ * Pops all other non-removed balloons except the balloon with 'id'
+ */
+function popAllBalloonsExcept(id) {
+	for (var i = 0; i < questions[questionCounter].options.length; i++) {
+		if (questions[questionCounter].options[i] != id) {
+			for (var balloon of balloonsArray) {
+				if (balloon.removed == false) {
+					updateScore(500);
+					popBalloon(questions[questionCounter].options[i]);
+				}
+			}
 		}
 	}
 }
@@ -281,11 +308,34 @@ function updateScore(amount) {
 	score += amount;
 	scoreText.text = "Score: " + score;
 
-	if (amount > 0) {
-		// nice
-	} else {
-		// bad
+	if (amount > 0) { // nice
+		createjs.Tween.get(scoreText).to({color:"#1dfc19"},1).wait(500).to({color:"white"}); // flash green
+	} else { // bad
+		createjs.Tween.get(scoreText).to({color:"red"},1).wait(500).to({color:"white"}); // flash red
 	}
+	scoreLastChangedAmount = amount;
+}
+
+/*
+ * Displays score change near popped balloon
+ */
+function displayScoreLabel(x, y) {
+
+	var tempLabel = new createjs.Text("", "22px Lato", "white");
+	tempLabel.x = x;
+	tempLabel.y = y;
+	tempLabel.alpha = 0;
+
+	if (scoreLastChangedAmount > 0) {
+		tempLabel.text = "+" + scoreLastChangedAmount;
+		tempLabel.color = "#1dfc19";
+	} else {
+		tempLabel.text = scoreLastChangedAmount;
+		tempLabel.color = "red";
+	}
+
+	stage.addChild(tempLabel);
+	createjs.Tween.get(tempLabel).to({alpha:1}, 200).wait(200).to({alpha:0}, 200).call(function remove() { stage.removeChild(tempLabel); });
 }
 
 /*
@@ -315,7 +365,7 @@ function updateBalloons() {
 	var resetBalloons = true;
 	for (var balloon of balloonsArray) {
 		balloon.sprite.y -= balloon.speed;
-		balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
+		balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2 - 4;
 
 		if (balloon.sprite.y + balloon.sprite.getBounds().height > 0) {
 			resetBalloons = false;

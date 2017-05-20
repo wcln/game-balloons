@@ -10,8 +10,30 @@
 var mute = false;
 var FPS = 24;
 
+// unicode characters for exponents
+var EXPONENT_2 = '\u00B2';
+var EXPONENT_3 = '\u00B3';
+var EXPONENT_4 = '\u2074';
+var EXPONENT_5 = '\u2075';
+var EXPONENT_6 = '\u2076';
+var EXPONENT_7 = '\u2077';
+
 var questions = [	
-					{question:"5x - 4", answer:"1" , options:["2","3","1","5","4", "6"]}
+					{question:"15x + 18", answer:"3" , options:["3","6","7","8","2","5"]},
+					{question:"8x - 20", answer:"", options:["5","8","2","3","4","6"]},
+					{question:"15x + 10", answer:"", options:["5","9","10","8","15","3"]},
+					{question:"7x + 21", answer:"", options:["21","8","3","7","9","5"]},
+					{question:"10x - 15", answer:"", options:["6","2","5","0","4","7"]},
+					{question:"7x - 21", answer:"", options:["7","4","8","0","2","5"]},
+					{question:"6x - 14", answer:"", options:["8","4","2","6","5","3"]},
+					{question:"6x + 15", answer:"", options:["2","3","15","4","6","9"]},
+					{question:"6x + 9", answer:"", options:["6","3","7","0","9","2"]},
+					{question:"12xy + 15y", answer:"", options:["3y","8","2x","5y","4x","7"]},
+					{question:"27xy"+EXPONENT_5+" - "+"15y"+EXPONENT_2, answer:"", options:["3y"+EXPONENT_2,"3x","5y"+EXPONENT_2,"y","xy"+EXPONENT_2,"3"]},
+					{question:"4x - 6xy", answer:"", options:["x","4x","2x","6y","1","3xy"]},
+					{question:"5xy - 4y", answer:"", options:["4y","6y","1","2","y","5y"]},
+					{question:"9x"+EXPONENT_6+" + "+"27x"+EXPONENT_3+"y", answer:"", options:["3x"+EXPONENT_2,"5y","2x"+EXPONENT_3,"9x"+EXPONENT_3,"4x","9"]}
+					// LEFT OFF ON QUESTION 17, SELECTION 48
 				];
 
 
@@ -28,7 +50,8 @@ var balloonsArray = [];
 var NUMBER_OF_BALLOONS = 6;
 var BALLOON_SPEED = 2;
 var balloonSpritesArray = [];
-
+var balloonsToPop = [];
+var lastTimePopped = 0;
 
 var gameStarted = false;
 var score;
@@ -244,7 +267,7 @@ function popBalloon(id) {
 	for (var balloon of balloonsArray) {
 		if (balloon.label.text == id) { // this is the balloon to pop
 			createjs.Tween.get(balloon.sprite).call(function animate() { 
-					balloon.sprite.gotoAndPlay("pop"); 
+					balloon.sprite.gotoAndPlay("pop");
 					playSound("pop");
 					displayScoreLabel(balloon.sprite.x, balloon.sprite.y);
 				}).wait(300).call(function remove() { 
@@ -263,14 +286,25 @@ function popBalloon(id) {
  * Pops all other non-removed balloons except the balloon with 'id'
  */
 function popAllBalloonsExcept(id) {
-	for (var i = 0; i < questions[questionCounter].options.length; i++) {
-		if (questions[questionCounter].options[i] != id) {
-			for (var balloon of balloonsArray) {
-				if (balloon.removed == false) {
-					updateScore(500);
-					popBalloon(questions[questionCounter].options[i]);
-				}
-			}
+	for (var balloon of balloonsArray) {
+		if (balloon.sprite.name != id && !balloon.removed) {
+			balloonsToPop.push(balloon.sprite.name);
+		}
+	}
+	shuffle(balloonsToPop); // pop them in random order
+}
+
+/*
+ * Pops balloons with delay (when popping all balloons)... so that they don't all pop at same time
+ */
+function popBalloonsWithDelay() {
+	if (balloonsToPop.length > 0) {
+		var currentTime = new Date().getTime();
+
+		if (currentTime - lastTimePopped > 100) {
+			popBalloon(balloonsToPop.pop());
+			updateScore(500);
+			lastTimePopped = new Date().getTime();
 		}
 	}
 }
@@ -385,7 +419,10 @@ function updateBalloons() {
 			}
 		}
 	}
+	
+	popBalloonsWithDelay();
 }
+
 
 /*
  * Sorts cloud objects by their size so that they are added to stage in correct order and will overlap correctly.

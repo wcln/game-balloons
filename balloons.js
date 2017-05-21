@@ -81,10 +81,7 @@ function init() {
 
 	score = 0; // reset game score
 	questionCounter = 0;
-
-
-    stage.on("stagemousedown", startGame, null, false);
-
+	stage.update();
 }
 
 /*
@@ -93,8 +90,10 @@ function init() {
 function update(event) {
  	if (gameStarted) {
 
- 		updateClouds();
- 		updateBalloons();
+ 		updateClouds(); // updates cloud positions
+ 		updateBalloons(); // updates balloon positions
+ 		updateQuestion(); // moves to next question if required
+
 
 
  	}
@@ -110,12 +109,13 @@ function startGame(event) {
 
 	event.remove();
 
-	// ticker calls update function, set the FPS
-	createjs.Ticker.setFPS(FPS);
-	createjs.Ticker.addEventListener("tick", update); // call update function
+
 
 	// remove start screen from visible canvas
 	//createjs.Tween.get(startText).to({x:-800}, 500).call(initGraphics);
+	stage.removeChild(startScreenImage);
+	startButtonImage.x = -300;
+	startButtonPressedImage.x = -300;
 	initGraphics();
 }
 
@@ -139,6 +139,7 @@ function initGraphics() {
 
 	gameStarted = true;
 }
+
 
 /*
  * Adds the score text to the stage
@@ -165,6 +166,36 @@ function initQuestionText() {
 	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
 	questionText.y = questionLabelText.y + questionLabelText.getMeasuredHeight() + 5;
 	stage.addChild(questionText);
+}
+
+/*
+ * Adds start button to stage and positions it
+ */
+function initStartButton() {
+	startButtonImage.x = STAGE_WIDTH/2 - startButtonImage.getBounds().width/2;
+	startButtonImage.y = 490;
+	startButtonImage.cursor = "pointer";
+	stage.addChild(startButtonImage);
+
+	startButtonPressedImage.x = startButtonImage.x;
+	startButtonPressedImage.y = startButtonImage.y;
+	startButtonPressedImage.cursor = "pointer";
+
+	// listeners
+	startButtonImage.on("click", function(event) {
+		startGame(event);
+	});
+	startButtonPressedImage.on("click", function(event) {
+		startGame(event);
+	});
+	startButtonImage.on("mouseover", function() {
+		stage.addChild(startButtonPressedImage);
+		stage.removeChild(startButtonImage);
+	});
+	startButtonPressedImage.on("mouseout", function() {
+		stage.addChild(startButtonImage);
+		stage.removeChild(startButtonPressedImage);
+	});
 }
 
 /*
@@ -375,8 +406,12 @@ function displayScoreLabel(x, y) {
 /*
  * Updates the question text and maintains center position
  */
-function updateQuestionText(text) {
-	// TODO
+function updateQuestionText() {
+	questionText.text = questions[questionCounter].question;
+	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
+
+	questionLabelText.text = "Question " + (questionCounter + 1);
+	questionLabelText.x = STAGE_WIDTH/2 - questionLabelText.getMeasuredWidth()/2;
 }
 
 /*
@@ -396,31 +431,73 @@ function updateClouds() {
  * Updates balloon position
  */
 function updateBalloons() {
-	var resetBalloons = true;
+
 	for (var balloon of balloonsArray) {
 		balloon.sprite.y -= balloon.speed;
 		balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2 - 4;
+	}
+	
+	popBalloonsWithDelay();
+}
 
+/*
+ * Increments the question if required
+ */
+function updateQuestion() {
+
+	// check if all balloons are past
+	var resetBalloons = true;
+	for (var balloon of balloonsArray) {
 		if (balloon.sprite.y + balloon.sprite.getBounds().height > 0) {
 			resetBalloons = false;
 		}
 	}
-	if (resetBalloons) {
-		for (var balloon of balloonsArray) {
-			balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
-			balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
-			balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
 
-			if (balloon.removed) {
-				balloon.removed = false;
-				balloon.sprite.gotoAndPlay("normal");
-				stage.addChild(balloon.sprite);
-				stage.addChild(balloon.label);
+	if (resetBalloons) {
+
+		var movedToNextQuestion = false;
+
+		// check if question was answered and if balloon info should be updated
+		for (var balloon of balloonsArray) {
+			if (balloon.label.text == questions[questionCounter].answer) {
+				if (balloon.removed) { // then question has been answered
+
+					movedToNextQuestion = true;
+
+					// update balloon info
+					questionCounter++;
+					updateQuestionText();
+
+					for (var i = 0; i < balloonsArray.length; i++) {
+						balloonsArray[i].sprite.name = questions[questionCounter].options[i];
+						balloonsArray[i].label.text = questions[questionCounter].options[i];
+					}
+				}
 			}
 		}
+		
+		respawnAllBalloons(movedToNextQuestion);
 	}
-	
-	popBalloonsWithDelay();
+}
+
+/*
+ * Moves balloons back to bottom of screen and resets animations and adds to stage
+ */
+function respawnAllBalloons(movedToNextQuestion) {
+	for (var balloon of balloonsArray) {
+		balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
+		balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
+		balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
+
+
+		if (balloon.removed && movedToNextQuestion) {
+			balloon.removed = false;
+			balloon.sprite.gotoAndPlay("normal");
+			stage.addChild(balloon.sprite);
+			stage.addChild(balloon.label);
+		}
+
+	}
 }
 
 
@@ -441,6 +518,7 @@ function compare(a, b) {
 // bitmap variables
 var backgroundImage;
 var cloudImage;
+var startScreenImage, startButtonImage, startButtonPressedImage; // start screen stuff
 
 
 // PRELOAD JS FUNCTIONS
@@ -462,6 +540,18 @@ function setupManifest() {
 		{
 			src: "images/cloud.png",
 			id: "cloud"
+		},
+		{
+			src: "images/startscreen.png",
+			id: "startscreen"
+		},
+		{
+			src: "images/start_button.png",
+			id: "start_button"
+		},
+		{
+			src: "images/start_button_pressed.png",
+			id: "start_button_pressed"
 		}
 	];
 }
@@ -483,6 +573,12 @@ function handleFileLoad(event) {
    		backgroundImage = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "cloud") {
    		cloudImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "startscreen") {
+   		startScreenImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "start_button") {
+   		startButtonImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "start_button_pressed") {
+   		startButtonPressedImage = new createjs.Bitmap(event.result);
    	}
 }
 
@@ -503,7 +599,13 @@ function handleFileProgress(event) {
 function loadComplete(event) {
     console.log("Finished Loading Assets");
 
+    // ticker calls update function, set the FPS
+	createjs.Ticker.setFPS(FPS);
+	createjs.Ticker.addEventListener("tick", update); // call update function
+
     stage.addChild(backgroundImage);
+    stage.addChild(startScreenImage);
+    initStartButton();
     stage.update();
 }
 

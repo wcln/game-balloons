@@ -33,8 +33,16 @@ var questions = [
 					{question:"4x - 6xy", answer:"2x", options:["x","4x","2x","6y","1","3xy"]},
 					{question:"5xy - 4y", answer:"y", options:["4y","6y","1","2","y","5y"]},
 					{question:"9x"+EXPONENT_6+" + "+"27x"+EXPONENT_3+"y", answer:"9x"+EXPONENT_3, options:["3x"+EXPONENT_2,"5y","2x"+EXPONENT_3,"9x"+EXPONENT_3,"4x","9"]},
-					{question:"8x"+EXPONENT_7+"  + 12x"+EXPONENT_4, answer:"4x"+EXPONENT_4, options:["5x"+EXPONENT_2,"4x"+EXPONENT_4,"2x","x","3x","6x"+EXPONENT_2]}
-					// LEFT OFF ON QUESTION 18 SELECTION 49
+					{question:"8x"+EXPONENT_7+"  + 12x"+EXPONENT_4, answer:"4x"+EXPONENT_4, options:["5x"+EXPONENT_2,"4x"+EXPONENT_4,"2x","x","3x","6x"+EXPONENT_2]},
+					{question:"14x - 2x"+EXPONENT_3, answer:"2x", options:["3x"+EXPONENT_2,"2x","1","2","2x"+EXPONENT_3,"x"]},
+					{question:"4x"+EXPONENT_5+" + 6x"+EXPONENT_3, answer:"2x"+EXPONENT_3, options:["3","7y","5x"+EXPONENT_2,"4x","6x"+EXPONENT_3, "2x"+EXPONENT_3]},
+					{question:"8x - 20x", answer:"4x", options:["6x","5x","4x","8","3x","4"]},
+					{question:"6x"+EXPONENT_2+"y + 3xy - 12y"+EXPONENT_3, answer:"3y", options:["x","2y","3xy","3y","6x","7"]},
+					{question:"6x"+EXPONENT_3+" + 2x"+EXPONENT_2+" - 10x"+EXPONENT_4, answer:"2x"+EXPONENT_2, options:["2","2x"+EXPONENT_2,"6x","2x","4x"+EXPONENT_3,"2x"+EXPONENT_3]},
+					{question:"6x"+EXPONENT_2+"y"+EXPONENT_4 + " - xy"+EXPONENT_4+" + 3x"+EXPONENT_3+"y"+EXPONENT_2, answer:"xy"+EXPONENT_2, options:["2x"+EXPONENT_2+"y"+EXPONENT_2,"3xy","2xy"+EXPONENT_2,"3xy"+EXPONENT_2,"2","xy"+EXPONENT_2]},
+					{question:"4x"+EXPONENT_3+"y"+EXPONENT_5+" - 2xy"+EXPONENT_4+" + 6x"+EXPONENT_3+"y"+EXPONENT_2, answer:"2xy"+EXPONENT_2, options:["2xy"+EXPONENT_2,"2x"+EXPONENT_3+"y"+EXPONENT_5,"2y","xy"+EXPONENT_2,"6x","2xy"]},
+					{question:"4xy"+EXPONENT_4+" - 6xy"+EXPONENT_2+" + 8x"+EXPONENT_3+"y"+EXPONENT_2, answer:"2xy"+EXPONENT_2, options:["2x"+EXPONENT_2+"y"+EXPONENT_2,"2xy"+EXPONENT_2,"2x","xy"+EXPONENT_2,"2xy","2y"]}
+					// LEFT OFF ON QUESTION 26 SELECTION 57
 				];
 
 

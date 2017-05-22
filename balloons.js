@@ -2,7 +2,7 @@
  * BCLearningNetwork.com
  * Greatest Common Factor
  * @author Colin Bernard (colinjbernard@hotmail.com)
- * March 2017
+ * May 2017
  */
 
 ////////// VARIABLES ///////////
@@ -20,20 +20,21 @@ var EXPONENT_7 = '\u2077';
 
 var questions = [	
 					{question:"15x + 18", answer:"3" , options:["3","6","7","8","2","5"]},
-					{question:"8x - 20", answer:"", options:["5","8","2","3","4","6"]},
-					{question:"15x + 10", answer:"", options:["5","9","10","8","15","3"]},
-					{question:"7x + 21", answer:"", options:["21","8","3","7","9","5"]},
-					{question:"10x - 15", answer:"", options:["6","2","5","0","4","7"]},
-					{question:"7x - 21", answer:"", options:["7","4","8","0","2","5"]},
-					{question:"6x - 14", answer:"", options:["8","4","2","6","5","3"]},
-					{question:"6x + 15", answer:"", options:["2","3","15","4","6","9"]},
-					{question:"6x + 9", answer:"", options:["6","3","7","0","9","2"]},
-					{question:"12xy + 15y", answer:"", options:["3y","8","2x","5y","4x","7"]},
-					{question:"27xy"+EXPONENT_5+" - "+"15y"+EXPONENT_2, answer:"", options:["3y"+EXPONENT_2,"3x","5y"+EXPONENT_2,"y","xy"+EXPONENT_2,"3"]},
-					{question:"4x - 6xy", answer:"", options:["x","4x","2x","6y","1","3xy"]},
-					{question:"5xy - 4y", answer:"", options:["4y","6y","1","2","y","5y"]},
-					{question:"9x"+EXPONENT_6+" + "+"27x"+EXPONENT_3+"y", answer:"", options:["3x"+EXPONENT_2,"5y","2x"+EXPONENT_3,"9x"+EXPONENT_3,"4x","9"]}
-					// LEFT OFF ON QUESTION 17, SELECTION 48
+					{question:"8x - 20", answer:"4", options:["5","8","2","3","4","6"]},
+					{question:"15x + 10", answer:"5", options:["5","9","10","8","15","3"]},
+					{question:"7x + 21", answer:"7", options:["21","8","3","7","9","5"]},
+					{question:"10x - 15", answer:"5", options:["6","2","5","0","4","7"]},
+					{question:"7x - 21", answer:"7", options:["7","4","8","0","2","5"]},
+					{question:"6x - 14", answer:"2", options:["8","4","2","6","5","3"]},
+					{question:"6x + 15", answer:"3", options:["2","3","15","4","6","9"]},
+					{question:"6x + 9", answer:"3", options:["6","3","7","0","9","2"]},
+					{question:"12xy + 15y", answer:"3y", options:["3y","8","2x","5y","4x","7"]},
+					{question:"27xy"+EXPONENT_5+" - "+"15y"+EXPONENT_2, answer:"3y"+EXPONENT_2, options:["3y"+EXPONENT_2,"3x","5y"+EXPONENT_2,"y","xy"+EXPONENT_2,"3"]},
+					{question:"4x - 6xy", answer:"2x", options:["x","4x","2x","6y","1","3xy"]},
+					{question:"5xy - 4y", answer:"y", options:["4y","6y","1","2","y","5y"]},
+					{question:"9x"+EXPONENT_6+" + "+"27x"+EXPONENT_3+"y", answer:"9x"+EXPONENT_3, options:["3x"+EXPONENT_2,"5y","2x"+EXPONENT_3,"9x"+EXPONENT_3,"4x","9"]},
+					{question:"8x"+EXPONENT_7+"  + 12x"+EXPONENT_4, answer:"4x"+EXPONENT_4, options:["5x"+EXPONENT_2,"4x"+EXPONENT_4,"2x","x","3x","6x"+EXPONENT_2]}
+					// LEFT OFF ON QUESTION 18 SELECTION 49
 				];
 
 
@@ -61,6 +62,7 @@ var questionCounter;
 // text
 var scoreText;
 var questionText, questionLabelText;
+
 
 /*
  * Handles initialization of game components
@@ -123,7 +125,23 @@ function startGame(event) {
  * Displays the end game screen
  */
 function endGame() {
+	gameStarted = false; // stop calling update function
 
+	stage.removeChild(questionText);
+	stage.removeChild(questionLabelText);
+
+	createjs.Tween.get(scoreText)
+		.to({x: STAGE_WIDTH/2 - (scoreText.getMeasuredWidth()/2) * 3, y: STAGE_HEIGHT/2 - (scoreText.getMeasuredHeight()/2) * 3 - 20, scaleX: 3, scaleY: 3, color:"black"}, 800)
+		.wait(200)
+		.call(function() {
+			var resetText = new createjs.Text("Click to Restart", '40px Lato', "black");
+			resetText.x = STAGE_WIDTH/2 - resetText.getMeasuredWidth()/2;
+			resetText.y = scoreText.y + 40 + scoreText.getMeasuredHeight();
+			stage.addChild(resetText);
+			stage.on("stagemousedown", function() {
+				location.reload(); // reload the page
+			}, null, false);
+		});
 }
 
 /*
@@ -410,7 +428,7 @@ function updateQuestionText() {
 	questionText.text = questions[questionCounter].question;
 	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
 
-	questionLabelText.text = "Question " + (questionCounter + 1);
+	questionLabelText.text = "Question " + questionCounter;
 	questionLabelText.x = STAGE_WIDTH/2 - questionLabelText.getMeasuredWidth()/2;
 }
 
@@ -466,11 +484,17 @@ function updateQuestion() {
 
 					// update balloon info
 					questionCounter++;
+
+					if (questionCounter == questions.length) { // check for GAME COMPLETE
+						endGame();
+					}
+
 					updateQuestionText();
 
 					for (var i = 0; i < balloonsArray.length; i++) {
 						balloonsArray[i].sprite.name = questions[questionCounter].options[i];
 						balloonsArray[i].label.text = questions[questionCounter].options[i];
+						balloonsArray[i].label.x = balloonsArray[i].sprite.x + balloonsArray[i].sprite.getBounds().width/2 - balloonsArray[i].label.getMeasuredWidth()/2;
 					}
 				}
 			}

@@ -517,12 +517,21 @@ function updateQuestion() {
  */
 function respawnAllBalloons(movedToNextQuestion) {
 	for (var balloon of balloonsArray) {
-		balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
-		balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
-		balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
+
+
+		if (!balloon.removed && !movedToNextQuestion) {
+			balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
+			balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
+			balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
+		}
 
 
 		if (balloon.removed && movedToNextQuestion) {
+
+			balloon.sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
+			balloon.speed = BALLOON_SPEED + Math.random() * 0.7;
+			balloon.label.y = balloon.sprite.y + balloon.sprite.getBounds().height/2 - balloon.label.getMeasuredHeight()/2;
+			
 			balloon.removed = false;
 			balloon.sprite.gotoAndPlay("normal");
 			stage.addChild(balloon.sprite);

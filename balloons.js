@@ -28,6 +28,8 @@ var questions = [
 					{question:"6x - 14", answer:"2", options:["8","4","2","6","5","3"]},
 					{question:"6x + 15", answer:"3", options:["2","3","15","4","6","9"]},
 					{question:"6x + 9", answer:"3", options:["6","3","7","0","9","2"]},
+					{question:"4x - 10", answer:"2", options:["1","0","3","2","4","8"]}, // 10
+					{question:"24x + 32", answer:"8", options:["2","4","9","1","3","8"]},
 					{question:"12xy + 15y", answer:"3y", options:["3y","8","2x","5y","4x","7"]},
 					{question:"27xy"+EXPONENT_5+" - "+"15y"+EXPONENT_2, answer:"3y"+EXPONENT_2, options:["3y"+EXPONENT_2,"3x","5y"+EXPONENT_2,"y","xy"+EXPONENT_2,"3"]},
 					{question:"4x - 6xy", answer:"2x", options:["x","4x","2x","6y","1","3xy"]},
@@ -36,13 +38,17 @@ var questions = [
 					{question:"8x"+EXPONENT_7+"  + 12x"+EXPONENT_4, answer:"4x"+EXPONENT_4, options:["5x"+EXPONENT_2,"4x"+EXPONENT_4,"2x","x","3x","6x"+EXPONENT_2]},
 					{question:"14x - 2x"+EXPONENT_3, answer:"2x", options:["3x"+EXPONENT_2,"2x","1","2","2x"+EXPONENT_3,"x"]},
 					{question:"4x"+EXPONENT_5+" + 6x"+EXPONENT_3, answer:"2x"+EXPONENT_3, options:["3","7y","5x"+EXPONENT_2,"4x","6x"+EXPONENT_3, "2x"+EXPONENT_3]},
-					{question:"8x - 20x", answer:"4x", options:["6x","5x","4x","8","3x","4"]},
+					{question:"8x - 20x", answer:"4x", options:["6x","5x","4x","8","3x","4"]}, // 20
 					{question:"6x"+EXPONENT_2+"y + 3xy - 12y"+EXPONENT_3, answer:"3y", options:["x","2y","3xy","3y","6x","7"]},
 					{question:"6x"+EXPONENT_3+" + 2x"+EXPONENT_2+" - 10x"+EXPONENT_4, answer:"2x"+EXPONENT_2, options:["2","2x"+EXPONENT_2,"6x","2x","4x"+EXPONENT_3,"2x"+EXPONENT_3]},
 					{question:"6x"+EXPONENT_2+"y"+EXPONENT_4 + " - xy"+EXPONENT_4+" + 3x"+EXPONENT_3+"y"+EXPONENT_2, answer:"xy"+EXPONENT_2, options:["2x"+EXPONENT_2+"y"+EXPONENT_2,"3xy","2xy"+EXPONENT_2,"3xy"+EXPONENT_2,"2","xy"+EXPONENT_2]},
 					{question:"4x"+EXPONENT_3+"y"+EXPONENT_5+" - 2xy"+EXPONENT_4+" + 6x"+EXPONENT_3+"y"+EXPONENT_2, answer:"2xy"+EXPONENT_2, options:["2xy"+EXPONENT_2,"2x"+EXPONENT_3+"y"+EXPONENT_5,"2y","xy"+EXPONENT_2,"6x","2xy"]},
-					{question:"4xy"+EXPONENT_4+" - 6xy"+EXPONENT_2+" + 8x"+EXPONENT_3+"y"+EXPONENT_2, answer:"2xy"+EXPONENT_2, options:["2x"+EXPONENT_2+"y"+EXPONENT_2,"2xy"+EXPONENT_2,"2x","xy"+EXPONENT_2,"2xy","2y"]}
-					// LEFT OFF ON QUESTION 26 SELECTION 57
+					{question:"4xy"+EXPONENT_4+" - 6xy"+EXPONENT_2+" + 8x"+EXPONENT_3+"y"+EXPONENT_2, answer:"2xy"+EXPONENT_2, options:["2x"+EXPONENT_2+"y"+EXPONENT_2,"2xy"+EXPONENT_2,"2x","xy"+EXPONENT_2,"2xy","2y"]},
+					{question:"6xy"+EXPONENT_4+" + 9x - 3x"+EXPONENT_3+"y"+EXPONENT_5, answer:"3x", options:["y","3xy","3x","xy","x","3"]},
+					{question:"15xy"+EXPONENT_4+" + 5x"+EXPONENT_3+"y"+EXPONENT_5+" - 25x"+EXPONENT_2+"y"+EXPONENT_4, answer:"5xy"+EXPONENT_4, options:["3xy"+EXPONENT_3,"5y","5xy"+EXPONENT_3,"5xy"+EXPONENT_4,"x","5xy"]},
+					{question:"9x"+EXPONENT_2+"y"+EXPONENT_4+" + 6xy"+EXPONENT_2+" - 3x"+EXPONENT_5+"y"+EXPONENT_3, answer:"3xy"+EXPONENT_2, options:["3y"+EXPONENT_2,"3","3xy"+EXPONENT_2,"3x","xy","3x"+EXPONENT_2]},
+					{question:"12xy"+EXPONENT_4+" + 4x"+EXPONENT_3+"y"+EXPONENT_5+" - 8x"+EXPONENT_3+"y"+EXPONENT_2, answer:"4xy"+EXPONENT_2, options:["4xy"+EXPONENT_2,"4xy","3xy"+EXPONENT_2,"3xy"+EXPONENT_4,"xy"+EXPONENT_2,"x"+EXPONENT_2+"y"+EXPONENT_2]},
+					{question:"12xy"+EXPONENT_2+"y"+EXPONENT_2+" - 9x"+EXPONENT_3+"y"+EXPONENT_5+" + 18x"+EXPONENT_2+"y"+EXPONENT_4, answer:"3x"+EXPONENT_2+"y"+EXPONENT_2, options:["2xy","2x"+EXPONENT_2+"y"+EXPONENT_2,"xy"+EXPONENT_2,"3x"+EXPONENT_2+"y"+EXPONENT_2,"xy","6xy"]} // 30
 				];
 
 
@@ -78,8 +84,8 @@ var questionText, questionLabelText;
  */
 function init() {
 	// set constants
-	STAGE_WIDTH = document.getElementById("gameCanvas").getAttribute("width");
-	STAGE_HEIGHT = document.getElementById("gameCanvas").getAttribute("height");
+	STAGE_WIDTH = parseInt(document.getElementById("gameCanvas").getAttribute("width"));
+	STAGE_HEIGHT = parseInt(document.getElementById("gameCanvas").getAttribute("height"));
 
 	// init state object
 	stage = new createjs.Stage("gameCanvas"); // canvas id is gameCanvas
@@ -164,6 +170,7 @@ function initGraphics() {
 
 
 	gameStarted = true;
+	displayLevelText("Level 1");
 }
 
 
@@ -244,6 +251,7 @@ function initBalloons() {
 		sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
 		sprite.name = questions[questionCounter].options[i];
 		sprite.on("click", function(event) {balloonClickHandler(event);});
+		sprite.cursor = "pointer";
 		stage.addChild(sprite);
 
 		// balloon label
@@ -273,6 +281,14 @@ function loadBalloonSpriteData(filename) {
 			pop: [0, 6, false]
 		}
 	};
+	// var spriteData = {
+	// 	images: ["images/red.png"],
+	// 	frames: {width:100, height:115, count:8, regX:0, regY:0, spacing:0, margin:0},
+	// 	animations: {
+	// 		normal: [0, false],
+	// 		pop: [0, 8, false]
+	// 	}
+	// };
 	var sprite = new createjs.Sprite(new createjs.SpriteSheet(spriteData));
 
 	balloonSpritesArray.push(sprite);
@@ -281,8 +297,17 @@ function loadBalloonSpriteData(filename) {
 /*
  * Called when a balloon is clicked
  */
-async function balloonClickHandler(event) {
+function balloonClickHandler(event) {
 	var id = event.target.name; // get ID of the balloon that was clicked
+
+	// prevents clicking on balloon if it is already removed (and performing animation)
+	for (var balloon of balloonsArray) {
+		if (balloon.label.text == id) {
+			if (balloon.removed) {
+				return;
+			}
+		}
+	}
 
 	popBalloon(id);
 
@@ -323,6 +348,7 @@ async function balloonClickHandler(event) {
 function popBalloon(id) {
 	for (var balloon of balloonsArray) {
 		if (balloon.label.text == id) { // this is the balloon to pop
+			balloon.removed = true;
 			createjs.Tween.get(balloon.sprite).call(function animate() { 
 					balloon.sprite.gotoAndPlay("pop");
 					playSound("pop");
@@ -331,7 +357,6 @@ function popBalloon(id) {
 					stage.removeChild(balloon.sprite);
 					stage.removeChild(balloon.label);
 					balloon.sprite.y = -100;
-					balloon.removed = true;
 				}
 			);
 			break;
@@ -405,6 +430,14 @@ function updateScore(amount) {
 		createjs.Tween.get(scoreText).to({color:"red"},1).wait(500).to({color:"white"}); // flash red
 	}
 	scoreLastChangedAmount = amount;
+}
+
+function displayLevelText(text) {
+	var levelText = new createjs.Text(text, "60px Lato", "white");
+	levelText.x = STAGE_WIDTH/2 - levelText.getMeasuredWidth()/2;
+	levelText.y = STAGE_HEIGHT;
+	stage.addChild(levelText);
+	createjs.Tween.get(levelText).to({y:-levelText.getMeasuredHeight(), alpha:0.4}, 3000).wait(3000).call(function(){stage.removeChild(levelText)});
 }
 
 /*
@@ -495,7 +528,11 @@ function updateQuestion() {
 
 					if (questionCounter == questions.length) { // check for GAME COMPLETE
 						endGame();
-					}
+					} else if (questionCounter == 10-1) { // LEVEL 2
+						displayLevelText("Level 2");
+					} else if (questionCounter == 20-1) { // LEVEL 3
+						displayLevelText("Level 3");
+					} 
 
 					updateQuestionText();
 

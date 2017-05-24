@@ -77,6 +77,8 @@ var questionCounter;
 var scoreText;
 var questionText, questionLabelText;
 
+var respawning = false; // used to fix bug and ensure function completes
+
 
 /*
  * Handles initialization of game components
@@ -469,7 +471,7 @@ function updateQuestionText() {
 	questionText.text = questions[questionCounter].question;
 	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
 
-	questionLabelText.text = "Question " + questionCounter;
+	questionLabelText.text = "Question " + (questionCounter + 1);
 	questionLabelText.x = STAGE_WIDTH/2 - questionLabelText.getMeasuredWidth()/2;
 }
 
@@ -518,9 +520,9 @@ function updateQuestion() {
 
 		// check if question was answered and if balloon info should be updated
 		for (var balloon of balloonsArray) {
-			if (balloon.label.text == questions[questionCounter].answer) {
-				if (balloon.removed) { // then question has been answered
-
+			if (balloon.label.text === questions[questionCounter].answer) {
+				if (balloon.removed && !respawning) { // then question has been answered
+					respawning = true;
 					movedToNextQuestion = true;
 
 					// update balloon info
@@ -530,8 +532,10 @@ function updateQuestion() {
 						endGame();
 					} else if (questionCounter == 10-1) { // LEVEL 2
 						displayLevelText("Level 2");
+						BALLOON_SPEED += 0.6;
 					} else if (questionCounter == 20-1) { // LEVEL 3
 						displayLevelText("Level 3");
+						BALLOON_SPEED += 0.6;
 					} 
 
 					updateQuestionText();
@@ -573,8 +577,8 @@ function respawnAllBalloons(movedToNextQuestion) {
 			balloon.sprite.gotoAndPlay("normal");
 			stage.addChild(balloon.sprite);
 			stage.addChild(balloon.label);
+			respawning = false;
 		}
-
 	}
 }
 

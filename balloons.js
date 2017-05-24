@@ -94,6 +94,14 @@ function init() {
 	stage.mouseEventsEnabled = true;
 	stage.enableMouseOver(); // Default, checks the mouse 20 times/second for hovering cursor changes
 
+	// these have to go here otherwise they don't load fast enough (was causing bug where sprite was null)
+	loadBalloonSpriteData("balloon_blue.png");
+	loadBalloonSpriteData("balloon_yellow.png");
+	loadBalloonSpriteData("balloon_green.png");
+	loadBalloonSpriteData("balloon_red.png");
+	loadBalloonSpriteData("balloon_orange.png");
+	loadBalloonSpriteData("balloon_purple.png");
+
 	setupManifest(); // preloadJS
 	startPreload();
 
@@ -233,19 +241,13 @@ function initStartButton() {
 	});
 }
 
+
 /*
  * Initializes balloon starting positions and objects
  */
 function initBalloons() {
 
 	var BALLOON_SPACING = 70;
-
-	loadBalloonSpriteData("balloon_blue.png");
-	loadBalloonSpriteData("balloon_yellow.png");
-	loadBalloonSpriteData("balloon_green.png");
-	loadBalloonSpriteData("balloon_red.png");
-	loadBalloonSpriteData("balloon_orange.png");
-	loadBalloonSpriteData("balloon_purple.png");
 
 	for (var i = 0; i < balloonSpritesArray.length; i++) {
 		var sprite = balloonSpritesArray[i];
@@ -294,6 +296,7 @@ function loadBalloonSpriteData(filename) {
 	var sprite = new createjs.Sprite(new createjs.SpriteSheet(spriteData));
 
 	balloonSpritesArray.push(sprite);
+
 }
 
 /*
@@ -338,7 +341,7 @@ function balloonClickHandler(event) {
 
 	} else { // INCORRECT ANSWER
 
-		updateScore(-500);
+		updateScore(-200);
 
 	}
 }
@@ -387,7 +390,7 @@ function popBalloonsWithDelay() {
 
 		if (currentTime - lastTimePopped > 100) {
 			popBalloon(balloonsToPop.pop());
-			updateScore(500);
+			updateScore(100);
 			lastTimePopped = new Date().getTime();
 		}
 	}
@@ -468,11 +471,15 @@ function displayScoreLabel(x, y) {
  * Updates the question text and maintains center position
  */
 function updateQuestionText() {
-	questionText.text = questions[questionCounter].question;
-	questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
+	if (questionCounter < questions.length) {
 
-	questionLabelText.text = "Question " + (questionCounter + 1);
-	questionLabelText.x = STAGE_WIDTH/2 - questionLabelText.getMeasuredWidth()/2;
+		questionText.text = questions[questionCounter].question;
+		questionText.x = STAGE_WIDTH/2 - questionText.getMeasuredWidth()/2;
+
+		questionLabelText.text = "Question " + (questionCounter + 1);
+		questionLabelText.x = STAGE_WIDTH/2 - questionLabelText.getMeasuredWidth()/2;
+	}
+
 }
 
 /*
@@ -545,6 +552,8 @@ function updateQuestion() {
 						balloonsArray[i].label.text = questions[questionCounter].options[i];
 						balloonsArray[i].label.x = balloonsArray[i].sprite.x + balloonsArray[i].sprite.getBounds().width/2 - balloonsArray[i].label.getMeasuredWidth()/2;
 					}
+				} else if (!balloon.removed && !respawning) { // if balloons reach top and not answered
+					updateScore(-500);
 				}
 			}
 		}

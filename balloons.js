@@ -314,22 +314,22 @@ function balloonClickHandler(event) {
 		}
 	}
 
+	// determine if got first one correct or not
+	var anyRemoved = false;
+	for (var balloon of balloonsArray) {
+		if (balloon.removed) {
+			anyRemoved = true;
+		}
+	}
+
 	popBalloon(id);
 
 	if (id == questions[questionCounter].answer) { // CORRECT ANSWER
 
-		// determine if got first one correct or not
-		var anyRemoved = false;
-		for (var balloon of balloonsArray) {
-			if (balloon.removed) {
-				anyRemoved = true;
-			}
-		}
-
 		if (!anyRemoved) { // first one correct!
+
 			updateScore(1000);
-
-
+			playSound("good");
 
 		} else { // a balloon has already been popped
 			updateScore(500);
@@ -554,6 +554,7 @@ function updateQuestion() {
 					}
 				} else if (!balloon.removed && !respawning) { // if balloons reach top and not answered
 					updateScore(-500);
+					playSound("bad");
 				}
 			}
 		}
@@ -623,6 +624,14 @@ function setupManifest() {
 		{
 			src: "sounds/pop.mp3",
 			id: "pop"
+		},
+		{
+			src: "sounds/good.mp3",
+			id: "good"
+		},
+		{
+			src: "sounds/bad.mp3",
+			id: "bad"
 		},
 		{
 			src: "images/background.jpg",

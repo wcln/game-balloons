@@ -188,7 +188,7 @@ function initGraphics() {
  * Adds the score text to the stage
  */
 function initScoreText() {
-	scoreText = new createjs.Text("Score: " + score, '20px Lato', "white");
+	scoreText = new createjs.Text("Score: " + score, '26px Lato', "white");
 	scoreText.x = 5;
 	scoreText.y = 5;
 	stage.addChild(scoreText);
@@ -330,9 +330,11 @@ function balloonClickHandler(event) {
 
 			updateScore(1000);
 			playSound("good");
+			showHitSplash(event.target.x, event.target.y);
 
 		} else { // a balloon has already been popped
 			updateScore(500);
+			showHitSplash(event.target.x, event.target.y);
 		}
 
 		// pop all the other balloons remaining
@@ -342,6 +344,7 @@ function balloonClickHandler(event) {
 	} else { // INCORRECT ANSWER
 
 		updateScore(-200);
+		showMissSplash(event.target.x, event.target.y);
 
 	}
 }
@@ -465,6 +468,34 @@ function displayScoreLabel(x, y) {
 
 	stage.addChild(tempLabel);
 	createjs.Tween.get(tempLabel).to({alpha:1}, 200).wait(200).to({alpha:0}, 200).call(function remove() { stage.removeChild(tempLabel); });
+}
+
+/*
+ * Shows the hit splash image when a question is answered
+ */
+function showHitSplash(x, y) {
+	y = y - hitSplashImage.getBounds().height;
+	hitSplashImage.x = x;
+	hitSplashImage.y = y;
+	hitSplashImage.alpha = 0;
+	stage.addChild(hitSplashImage);
+	createjs.Tween.get(hitSplashImage).to({alpha:1}, 400).to({alpha:0}, 800).call(function() {
+		stage.removeChild(hitSplashImage);
+	})
+}
+
+/*
+ * Shows the miss splash image (wrong answer)
+ */
+function showMissSplash(x, y) {
+	y = y - hitSplashImage.getBounds().height;
+	missSplashImage.x = x;
+	missSplashImage.y = y;
+	missSplashImage.alpha = 0;
+	stage.addChild(missSplashImage);
+	createjs.Tween.get(missSplashImage).to({alpha:1}, 400).to({alpha:0}, 800).call(function() {
+		stage.removeChild(missSplashImage);
+	})
 }
 
 /*
@@ -611,6 +642,7 @@ function compare(a, b) {
 var backgroundImage;
 var cloudImage;
 var startScreenImage, startButtonImage, startButtonPressedImage; // start screen stuff
+var hitSplashImage, missSplashImage;
 
 
 // PRELOAD JS FUNCTIONS
@@ -652,6 +684,14 @@ function setupManifest() {
 		{
 			src: "images/start_button_pressed.png",
 			id: "start_button_pressed"
+		},
+		{
+			src: "images/hit_splash.png",
+			id: "hit_splash"
+		},
+		{
+			src: "images/miss_splash.png",
+			id: "miss_splash"
 		}
 	];
 }
@@ -679,6 +719,10 @@ function handleFileLoad(event) {
    		startButtonImage = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "start_button_pressed") {
    		startButtonPressedImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "hit_splash") {
+   		hitSplashImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "miss_splash") {
+   		missSplashImage = new createjs.Bitmap(event.result);
    	}
 }
 

@@ -95,12 +95,12 @@ function init() {
 	stage.enableMouseOver(); // Default, checks the mouse 20 times/second for hovering cursor changes
 
 	// these have to go here otherwise they don't load fast enough (was causing bug where sprite was null)
-	loadBalloonSpriteData("balloon_blue.png");
-	loadBalloonSpriteData("balloon_yellow.png");
-	loadBalloonSpriteData("balloon_green.png");
-	loadBalloonSpriteData("balloon_red.png");
-	loadBalloonSpriteData("balloon_orange.png");
-	loadBalloonSpriteData("balloon_purple.png");
+	loadBalloonSpriteData("balloon_sprite_blue.png");
+	loadBalloonSpriteData("balloon_sprite_yellow.png");
+	loadBalloonSpriteData("balloon_sprite_green.png");
+	loadBalloonSpriteData("balloon_sprite_red.png");
+	loadBalloonSpriteData("balloon_sprite_orange.png");
+	loadBalloonSpriteData("balloon_sprite_purple.png");
 
 	setupManifest(); // preloadJS
 	startPreload();
@@ -279,20 +279,12 @@ function initBalloons() {
 function loadBalloonSpriteData(filename) {
 	var spriteData = {
 		images: ["images/" + filename],
-		frames: {width:100, height:115, count:7, regX:0, regY:0, spacing:5, margin:0},
+		frames: {width:130, height:130, count:7, regX:0, regY:0, spacing:0, margin:0},
 		animations: {
 			normal: [0, false],
 			pop: [0, 6, false]
 		}
 	};
-	// var spriteData = {
-	// 	images: ["images/red.png"],
-	// 	frames: {width:100, height:115, count:8, regX:0, regY:0, spacing:0, margin:0},
-	// 	animations: {
-	// 		normal: [0, false],
-	// 		pop: [0, 8, false]
-	// 	}
-	// };
 	var sprite = new createjs.Sprite(new createjs.SpriteSheet(spriteData));
 
 	balloonSpritesArray.push(sprite);

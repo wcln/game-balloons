@@ -664,7 +664,7 @@ function setupManifest() {
 			id: "cloud"
 		},
 		{
-			src: "images/startscreen.png",
+			src: "images/startscreen_sig_figs.png",
 			id: "startscreen"
 		},
 		{

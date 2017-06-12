@@ -37,7 +37,7 @@ var questions = [
 					{question:"15.0 / 112", answer:"3", options:["1","2","3","4","5"]},
 					{question:"115.0 - 3.0", answer:"4", options:["1","2","3","4","5"]},
 					{question:"3x10"+EXPONENT_8, answer:"1", options:["1","2","3","4","5"]},
-					{question:"6.210 x 0.0237", answer:"4", options:["1","2","3","4","5"]},
+					{question:"6.210 x 0.0237", answer:"3", options:["1","2","3","4","5"]},
 					{question:"12.0 + 110.0", answer:"4", options:["1","2","3","4","5"]},
 					{question:"6.2 - 0.027", answer:"2", options:["1","2","3","4","5"]},
 					{question:"3.0x10"+EXPONENT_8, answer:"2", options:["1","2","3","4","5"]},

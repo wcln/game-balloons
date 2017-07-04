@@ -247,11 +247,11 @@ function initStartButton() {
  */
 function initBalloons() {
 
-	var BALLOON_SPACING = 70;
+	var BALLOON_SPACING = 15;
 
 	for (var i = 0; i < balloonSpritesArray.length; i++) {
 		var sprite = balloonSpritesArray[i];
-		sprite.x = 60 + (sprite.getBounds().width + 35) * i;
+		sprite.x = 25 + (sprite.getBounds().width + BALLOON_SPACING) * i;
 		sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
 		sprite.name = questions[questionCounter].options[i];
 		sprite.on("click", function(event) {balloonClickHandler(event);});

@@ -98,7 +98,7 @@ function init() {
 	loadBalloonSpriteData("balloon_sprite_green.png");
 	loadBalloonSpriteData("balloon_sprite_red.png");
 	loadBalloonSpriteData("balloon_sprite_orange.png");
-	loadBalloonSpriteData("balloon_sprite_purple.png");
+	//loadBalloonSpriteData("balloon_sprite_purple.png");
 
 	setupManifest(); // preloadJS
 	startPreload();
@@ -245,11 +245,11 @@ function initStartButton() {
  */
 function initBalloons() {
 
-	var BALLOON_SPACING = 70;
+	var BALLOON_SPACING = 35;
 
 	for (var i = 0; i < balloonSpritesArray.length; i++) {
 		var sprite = balloonSpritesArray[i];
-		sprite.x = 60 + (sprite.getBounds().width + 35) * i;
+		sprite.x = 60 + (sprite.getBounds().width + BALLOON_SPACING) * i;
 		sprite.y = parseInt(STAGE_HEIGHT) + Math.floor(Math.random() * 40);
 		sprite.name = questions[questionCounter].options[i];
 		sprite.on("click", function(event) {balloonClickHandler(event);});

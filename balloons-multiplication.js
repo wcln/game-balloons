@@ -175,10 +175,70 @@ function initGraphics() {
 	initBalloons();
 	initScoreText();
 	initQuestionText();
+	initPlayPauseButtons();
+	initMuteUnmuteButtons();
 
 
 	gameStarted = true;
 	displayLevelText("Level 1");
+}
+
+/*
+ * Adds the mute and unmute buttons to the stage and defines listeners
+ */
+function initMuteUnmuteButtons() {
+	var hitArea = new createjs.Shape();
+	hitArea.graphics.beginFill("#000").drawRect(0, 0, muteButton.image.width, muteButton.image.height);
+	muteButton.hitArea = unmuteButton.hitArea = hitArea;
+
+	muteButton.x = unmuteButton.x = 45;
+	muteButton.y = unmuteButton.y = 45;
+
+	muteButton.on("click", toggleMute);
+	unmuteButton.on("click", toggleMute);
+
+	stage.addChild(muteButton);
+}
+
+/*
+ * Adds the play and pause buttons to the stage and defines listeners
+ */
+function initPlayPauseButtons() {
+
+	var hitArea = new createjs.Shape();
+	hitArea.graphics.beginFill("#000").drawRect(0, 0, playButton.image.width, playButton.image.height);
+	playButton.hitArea = pauseButton.hitArea = hitArea;
+
+	playButton.x = pauseButton.x = 5;
+	playButton.y = pauseButton.y = 45;
+
+	pauseButton.on("click", function() {
+		stage.addChild(playButton);
+		stage.removeChild(pauseButton);
+
+		// remove all balloons to prevent user from pausing game for more time
+		for (var balloon of balloonsArray) {
+			balloon.sprite.set({visible:false});
+			balloon.label.set({visible:false});
+		}
+
+		gameStarted = false;
+	});
+
+	playButton.on("click", function() {
+		stage.addChild(pauseButton);
+		stage.removeChild(playButton);
+
+		// re-add the balloons
+		for (var balloon of balloonsArray) {
+			balloon.sprite.set({visible:true});
+			balloon.label.set({visible:true});
+		}
+
+		gameStarted = true;
+	});
+
+	stage.addChild(pauseButton); // pause button is visible by default (game is playing already)
 }
 
 
@@ -633,6 +693,8 @@ var backgroundImage;
 var cloudImage;
 var startScreenImage, startButtonImage, startButtonPressedImage; // start screen stuff
 var hitSplashImage, missSplashImage;
+var playButton, pauseButton;
+var muteButton, unmuteButton;
 
 
 // PRELOAD JS FUNCTIONS
@@ -682,6 +744,22 @@ function setupManifest() {
 		{
 			src: "images/miss_splash.png",
 			id: "miss_splash"
+		},
+		{
+			src: "images/pause.png",
+			id: "pause"
+		},
+		{
+			src: "images/play.png",
+			id: "play"
+		},
+		{
+			src: "images/mute.png",
+			id: "mute"
+		},
+		{
+			src: "images/unmute.png",
+			id: "unmute"
 		}
 	];
 }
@@ -713,6 +791,14 @@ function handleFileLoad(event) {
    		hitSplashImage = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "miss_splash") {
    		missSplashImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "pause") {
+   		pauseButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "play") {
+   		playButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "mute") {
+   		muteButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "unmute") {
+   		unmuteButton = new createjs.Bitmap(event.result);
    	}
 }
 

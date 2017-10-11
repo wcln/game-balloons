@@ -454,7 +454,7 @@ function popBalloonsWithDelay() {
  */
 function initClouds() {
 	for (var i = 0; i < NUMBER_OF_CLOUDS; i++) {
-		var tempCloud = Object.create(cloudImage);
+		var tempCloud = Object.create(cloudImagesArray[Math.floor(Math.random()*cloudImagesArray.length)]); // get random cloud image
 		tempCloud.x = Math.floor(Math.random() * STAGE_WIDTH) + 50; // between 50 and stage width
 		tempCloud.y = Math.floor(Math.random() * 400) + 0;
 		tempCloud.scaleX = Math.random() * 1.2 + 0.5;
@@ -690,7 +690,7 @@ function compare(a, b) {
 
 // bitmap variables
 var backgroundImage;
-var cloudImage;
+var cloudImagesArray = [];
 var startScreenImage, startButtonImage, startButtonPressedImage; // start screen stuff
 var hitSplashImage, missSplashImage;
 var playButton, pauseButton;
@@ -722,8 +722,20 @@ function setupManifest() {
 			id: "background"
 		},
 		{
-			src: "images/cloud.png",
-			id: "cloud"
+			src: "images/cloud1.png",
+			id: "cloud1"
+		},
+		{
+			src: "images/cloud2.png",
+			id: "cloud2"
+		},
+		{
+			src: "images/cloud3.png",
+			id: "cloud3"
+		},
+		{
+			src: "images/cloud4.png",
+			id: "cloud4"
 		},
 		{
 			src: "images/startscreen_sig_figs.png",
@@ -779,8 +791,8 @@ function handleFileLoad(event) {
     // create bitmaps of images
    	if (event.item.id == "background") {
    		backgroundImage = new createjs.Bitmap(event.result);
-   	} else if (event.item.id == "cloud") {
-   		cloudImage = new createjs.Bitmap(event.result);
+   	} else if (event.item.id.includes("cloud")) {
+   		cloudImagesArray.push(new createjs.Bitmap(event.result));
    	} else if (event.item.id == "startscreen") {
    		startScreenImage = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "start_button") {

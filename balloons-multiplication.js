@@ -62,18 +62,104 @@ var levels = [
 							question:"9 x 7", answer:"63", options:["56","63","81","70","72"]
 						},
 						{
-							question:"8 x 7", answer:"56", options:["49","63","56","49","81"]
+							question:"8 x 7", answer:"56", options:["49","63","56","51","81"]
+						}
+					]
+				},
+				{
+					level4:
+					[
+						{
+							name: "Level 4 - Speed Up!", speed:1,
+							question:"5 x 10", answer:"50", options:["55","50","5","500","15"]
+						},
+						{
+							question:"8 x 8", answer:"64", options:["81","74","64","56","72"]
+						},
+						{
+							question:"6 x 7", answer:"42", options:["24","36","35","42","49"]
+						},
+						{
+							question:"9 x 6", answer:"54", options:["54","56","49","48","64"]
+						}
+					]
+				},
+				{
+					level5:
+					[
+						{
+							name: "Level 5", speed:-1,
+							question:"4 x 12", answer:"48", options:["60","44","46","50","48"]
+						},
+						{
+							question:"12 x 10", answer:"120", options:["122","120","20","80","144"]
+						},
+						{
+							question:"9 x 11", answer:"99", options:["99","81","98","111","89"]
+						},
+						{
+							question:"12 x 6", answer:"72", options:["48","64","72","81","74"]
+						}
+					]
+				},
+				{
+					level6:
+					[
+						{
+							name: "Level 6 - Faster!", speed:1,
+							question:"11 x 12", answer:"132", options:["134","121","132","122","112"]
+						},
+						{
+							question:"10 x 10", answer:"100", options:["100","1111","120","110","10"]
+						},
+						{
+							question:"2 x 9", answer:"18", options:["81","18","16","36","14"]
+						},
+						{
+							question:"3 x 9", answer:"27", options:["21","29","28","27","31"]
+						}
+					]
+				},
+				{
+					level7:
+					[
+						{
+							name: "Level 7 - Keep It Up", speed:1,
+							question:"12 x 12", answer:"144", options:["134","132","144","122","146"]
+						},
+						{
+							question:"1 x 11", answer:"11", options:["11","111","1","10","9"]
+						},
+						{
+							question:"4 x 5", answer:"20", options:["20","25","40","15","30"]
+						},
+						{
+							question:"6 x 8", answer:"48", options:["46","48","28","64","54"]
+						}
+					]
+				},
+				{
+					level8:
+					[
+						{
+							name: "Level 8 - Last One", speed:1,
+							question:"8 x 12", answer:"96", options:["84","96","88","92","108"]
+						},
+						{
+							question:"10 x 7", answer:"70", options:["77","10","7","70","100"]
+						},
+						{
+							question:"8 x 5", answer:"40", options:["55","45","40","35","30"]
+						},
+						{
+							question:"9 x 12", answer:"108", options:["108","106","96","88","84"]
 						}
 					]
 				}
+
 			]
 
-var questions = [];
-for (var level of levels) {
-	for (var q of level[Object.keys(level)[0]]) {
-		questions.push(q);
-	}
-}
+var questions = []; // loaded in loadQuestions
 
 // constants (set in init function)
 var STAGE_WIDTH;
@@ -116,6 +202,8 @@ function init() {
 	stage = new createjs.Stage("gameCanvas"); // canvas id is gameCanvas
 	stage.mouseEventsEnabled = true;
 	stage.enableMouseOver(); // Default, checks the mouse 20 times/second for hovering cursor changes
+
+	loadQuestions();
 
 	// these have to go here otherwise they don't load fast enough (was causing bug where sprite was null)
 	loadBalloonSpriteData("balloon_sprite_blue.png");
@@ -183,12 +271,23 @@ function endGame() {
 		.call(function() {
 			var resetText = new createjs.Text("Click to Restart", '40px Lato', "black");
 			resetText.x = STAGE_WIDTH/2 - resetText.getMeasuredWidth()/2;
-			resetText.y = scoreText.y + 40 + scoreText.getMeasuredHeight();
+			resetText.y = scoreText.y + 50 + scoreText.getMeasuredHeight();
 			stage.addChild(resetText);
 			stage.on("stagemousedown", function() {
 				location.reload(); // reload the page
 			}, null, false);
 		});
+}
+
+/*
+ * Loads the questions array with data.
+ */
+function loadQuestions() {
+	for (var level of levels) {
+		for (var q of level[Object.keys(level)[0]]) {
+			questions.push(q);
+		}
+	}
 }
 
 /*
@@ -356,6 +455,21 @@ function initBalloons() {
 	}
 }
 
+var backgroundCounter = 0;
+function nextBackground() {
+	backgroundCounter++;
+
+	backgroundsArray[backgroundCounter].x = STAGE_WIDTH;
+
+	stage.addChildAt(backgroundsArray[backgroundCounter], 1);
+
+	createjs.Tween.get(backgroundsArray[backgroundCounter]).to({x: 0}, 1000);
+	createjs.Tween.get(backgroundsArray[backgroundCounter - 1]).to({x: -STAGE_WIDTH}, 1000).call(function() {
+		stage.removeChild(backgroundsArray[backgroundCounter - 1]);
+	});
+
+}
+
 /*
  * Loads balloon sprites into sprite array
  */
@@ -481,7 +595,7 @@ function initClouds() {
 	for (var i = 0; i < NUMBER_OF_CLOUDS; i++) {
 		var tempCloud = Object.create(cloudImagesArray[Math.floor(Math.random()*cloudImagesArray.length)]); // get random cloud image
 		tempCloud.x = Math.floor(Math.random() * STAGE_WIDTH) + 50; // between 50 and stage width
-		tempCloud.y = Math.floor(Math.random() * 400) + 0;
+		tempCloud.y = Math.floor(Math.random() * 400) + 100;
 		tempCloud.scaleX = Math.random() * 1.2 + 0.5;
 		tempCloud.scaleY = tempCloud.scaleX;
 		tempCloud.alpha = 0;
@@ -640,14 +754,12 @@ function updateQuestion() {
 
 					// update balloon info
 					questionCounter++;
-					console.log(questions[questionCounter]);
 					if (questionCounter == questions.length) { // check for GAME COMPLETE
 						endGame();
-					} else if (questions[questionCounter].hasOwnProperty("name")) {
-						console.log("ITS HAPPENING");
+					} else if (questions[questionCounter].hasOwnProperty("name")) { // new LEVEL
 						displayLevelText(questions[questionCounter].name)
 						BALLOON_SPEED += questions[questionCounter].speed;
-
+						nextBackground();
 					}
 
 					updateQuestionText();
@@ -713,7 +825,8 @@ function compare(a, b) {
 //////////////////////////////////////////////////////// PRE LOAD JS STUFF
 
 // bitmap variables
-var backgroundImage;
+var skyImage;
+var backgroundsArray = [];
 var cloudImagesArray = [];
 var startScreenImage, startButtonImage, startButtonPressedImage; // start screen stuff
 var hitSplashImage, missSplashImage;
@@ -743,7 +856,7 @@ function setupManifest() {
 		},
 		{
 			src: "images/background.jpg",
-			id: "background"
+			id: "sky"
 		},
 		{
 			src: "images/cloud1.png",
@@ -796,6 +909,38 @@ function setupManifest() {
 		{
 			src: "images/unmute.png",
 			id: "unmute"
+		},
+		{
+			src: "images/background1.png",
+			id: "background1"
+		},
+		{
+			src: "images/background2.png",
+			id: "background2"
+		},
+		{
+			src: "images/background3.png",
+			id: "background3"
+		},
+		{
+			src: "images/background4.png",
+			id: "background4"
+		},
+		{
+			src: "images/background5.png",
+			id: "background5"
+		},
+		{
+			src: "images/background6.png",
+			id: "background6"
+		},
+		{
+			src: "images/background7.png",
+			id: "background7"
+		},
+		{
+			src: "images/background8.png",
+			id: "background8"
 		}
 	];
 }
@@ -813,8 +958,8 @@ function startPreload() {
 function handleFileLoad(event) {
 	console.log("A file has loaded of type: " + event.item.type);
     // create bitmaps of images
-   	if (event.item.id == "background") {
-   		backgroundImage = new createjs.Bitmap(event.result);
+   	if (event.item.id.includes("background")) {
+   		backgroundsArray.push(new createjs.Bitmap(event.result));
    	} else if (event.item.id.includes("cloud")) {
    		cloudImagesArray.push(new createjs.Bitmap(event.result));
    	} else if (event.item.id == "startscreen") {
@@ -835,6 +980,8 @@ function handleFileLoad(event) {
    		muteButton = new createjs.Bitmap(event.result);
    	} else if (event.item.id == "unmute") {
    		unmuteButton = new createjs.Bitmap(event.result);
+   	} else if (event.item.id == "sky") {
+   		skyImage = new createjs.Bitmap(event.result);
    	}
 }
 
@@ -859,7 +1006,8 @@ function loadComplete(event) {
 	createjs.Ticker.setFPS(FPS);
 	createjs.Ticker.addEventListener("tick", update); // call update function
 
-    stage.addChild(backgroundImage);
+	stage.addChild(skyImage);
+    stage.addChild(backgroundsArray[0]);
     stage.addChild(startScreenImage);
     initStartButton();
     stage.update();

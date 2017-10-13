@@ -2,7 +2,7 @@
  * BCLearningNetwork.com
  * Balloons - Significant Figures
  * @author Colin Bernard (colinjbernard@hotmail.com)
- * May 2017
+ * October 2017
  */
 
 ////////// VARIABLES ///////////
@@ -10,45 +10,70 @@
 var mute = false;
 var FPS = 24;
 
-// unicode characters for exponents
-var EXPONENT_2 = '\u00B2';
-var EXPONENT_3 = '\u00B3';
-var EXPONENT_4 = '\u2074';
-var EXPONENT_5 = '\u2075';
-var EXPONENT_6 = '\u2076';
-var EXPONENT_7 = '\u2077';
-var EXPONENT_8 = '\u2078';
+// only first question entry in each level requires a name
+var levels = [
+				{
+					level1: 
+					[
+						{
+							name: "Level 1", 
+							question:"2 x 4", answer:"8", options:["2","8","4","6","12"]
+						},
+						{
+							question:"3 x 2", answer:"6", options:["6","5","3","4","2"]
+						},
+						{
+							question:"1 x 1", answer:"1", options:["3","2","1","11","0"]
+						},
+						{
+							question:"3 x 3", answer:"9", options:["33","9","3","6","13"]
+						}
+					]
+				},
+				{
+					level2:
+					[
+						{
+							name: "Level 2 - Speed Up!", speed:1,
+							question:"2 x 2", answer:"4", options:["3","6","12","2","4"]
+						},
+						{
+							question:"6 x 6", answer:"36", options:["16","36","33","46","30"]
+						},
+						{
+							question:"6 x 4", answer:"24", options:["24","36","42","18","30"]
+						},
+						{
+							question:"3 x 4", answer:"12", options:["14","15","18","12","20"]
+						}
+					]
+				},
+				{
+					level3:
+					[
+						{
+							name: "Level 3", speed:-1,
+							question:"4 x 10", answer:"40", options:["40","400","44","14","4"]
+						},
+						{
+							question:"5 x 9", answer:"45", options:["40","55","50","45","60"]
+						},
+						{
+							question:"9 x 7", answer:"63", options:["56","63","81","70","72"]
+						},
+						{
+							question:"8 x 7", answer:"56", options:["49","63","56","49","81"]
+						}
+					]
+				}
+			]
 
-var questions = [	
-					{question:"123", answer:"3", options:["1","2","3","4","5"]},
-					{question:"300", answer:"1", options:["1","2","3","4","5"]},
-					{question:"20.", answer:"2", options:["1","2","3","4","5"]},
-					{question:"0.00124", answer:"3", options:["1","2","3","4","5"]},
-					{question:"50.0", answer:"3", options:["1","2","3","4","5"]},
-					{question:"30050", answer:"4", options:["1","2","3","4","5"]},
-					{question:"3000.", answer:"4", options:["1","2","3","4","5"]},
-					{question:"0.0120", answer:"3", options:["1","2","3","4","5"]},
-					{question:"12.30", answer:"4", options:["1","2","3","4","5"]},
-					{question:"3.01x10"+EXPONENT_3, answer:"3", options:["1","2","3","4","5"]},
-					{question:"6.21 / 0.0237", answer:"3", options:["1","2","3","4","5"]},
-					{question:"15 x 112", answer:"2", options:["1","2","3","4","5"]},
-					{question:"1.201x10"+EXPONENT_4, answer:"4", options:["1","2","3","4","5"]},
-					{question:"6.210 + 0.0237", answer:"4", options:["1","2","3","4","5"]},
-					{question:"15.0 / 112", answer:"3", options:["1","2","3","4","5"]},
-					{question:"115.0 - 3.0", answer:"4", options:["1","2","3","4","5"]},
-					{question:"3x10"+EXPONENT_8, answer:"1", options:["1","2","3","4","5"]},
-					{question:"6.210 x 0.0237", answer:"3", options:["1","2","3","4","5"]},
-					{question:"12.0 + 110.0", answer:"4", options:["1","2","3","4","5"]},
-					{question:"6.2 - 0.027", answer:"2", options:["1","2","3","4","5"]},
-					{question:"3.0x10"+EXPONENT_8, answer:"2", options:["1","2","3","4","5"]},
-					{question:"300500", answer:"4", options:["1","2","3","4","5"]},
-					{question:"31000.", answer:"5", options:["1","2","3","4","5"]},
-					{question:"6.210 + 0.02", answer:"3", options:["1","2","3","4","5"]},
-					{question:"15.0 / 11", answer:"2", options:["1","2","3","4","5"]},
-					{question:"15.0 - 3.0", answer:"3", options:["1","2","3","4","5"]},
-					{question:"3.1x10"+EXPONENT_8, answer:"2", options:["1","2","3","4","5"]}
-				];
-
+var questions = [];
+for (var level of levels) {
+	for (var q of level[Object.keys(level)[0]]) {
+		questions.push(q);
+	}
+}
 
 // constants (set in init function)
 var STAGE_WIDTH;
@@ -61,7 +86,7 @@ var NUMBER_OF_CLOUDS = 10;
 // balloons
 var balloonsArray = [];
 var NUMBER_OF_BALLOONS = 6;
-var BALLOON_SPEED = 2;
+var BALLOON_SPEED = 3.5;
 var balloonSpritesArray = [];
 var balloonsToPop = [];
 var lastTimePopped = 0;
@@ -615,16 +640,15 @@ function updateQuestion() {
 
 					// update balloon info
 					questionCounter++;
-
+					console.log(questions[questionCounter]);
 					if (questionCounter == questions.length) { // check for GAME COMPLETE
 						endGame();
-					} else if (questionCounter == 10-1) { // LEVEL 2
-						displayLevelText("Level 2");
-						BALLOON_SPEED += 0.6;
-					} else if (questionCounter == 20-1) { // LEVEL 3
-						displayLevelText("Level 3");
-						BALLOON_SPEED += 0.6;
-					} 
+					} else if (questions[questionCounter].hasOwnProperty("name")) {
+						console.log("ITS HAPPENING");
+						displayLevelText(questions[questionCounter].name)
+						BALLOON_SPEED += questions[questionCounter].speed;
+
+					}
 
 					updateQuestionText();
 
@@ -738,7 +762,7 @@ function setupManifest() {
 			id: "cloud4"
 		},
 		{
-			src: "images/startscreen_sig_figs.png",
+			src: "images/startscreen_multiplication.png",
 			id: "startscreen"
 		},
 		{

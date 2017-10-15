@@ -42,8 +42,8 @@ function shuffle(a) {
 }
 
 /*
-* Plays a sound if the game is not muted.
-*/
+ * Plays a sound if the game is not muted.
+ */
 function playSound(id) {
 	if (mute == false) {
 		createjs.Sound.play(id);

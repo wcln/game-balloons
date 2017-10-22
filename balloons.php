@@ -31,9 +31,11 @@
 				for (var j = 0; j <= numquestions; j++) {
 
 					let options = [];
-					for (var k = 0; k < 5; k++) {
+					for (var k = 0; k < 4; k++) {
 						options[k] = json['o_'+i+''+j+''+k];
 					}
+					options[4] = json['a_'+i+''+j]; // add the answer as an option
+					shuffle(options);
 
 					if (j == 0) {
 						questions.push({name: json['levelname'+i], speed: json['levelspeed'+i], question: json['q_'+i+''+j], answer: json['a_'+i+''+j], options: options});

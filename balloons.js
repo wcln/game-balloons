@@ -169,8 +169,9 @@ function initMuteUnmuteButtons() {
  */
 function initStartScreenText() {
 	descriptionText = new createjs.Text(description, '18px Lato', 'black');
-	descriptionText.maxWidth = 560;
-	descriptionText.x = STAGE_WIDTH/2 - descriptionText.getMeasuredWidth()/2;
+	descriptionText.textAlign = 'center';
+	descriptionText.lineWidth = 560;
+	descriptionText.x = STAGE_WIDTH/2;
 	descriptionText.y = 240;
 	stage.addChild(descriptionText);
 

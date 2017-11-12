@@ -10,157 +10,6 @@
 var mute = false;
 var FPS = 24;
 
-// only first question entry in each level requires a name
-var levels = [
-				{
-					level1: 
-					[
-						{
-							name: "Level 1", 
-							question:"2 x 4", answer:"8", options:["2","8","4","6","12"]
-						},
-						{
-							question:"3 x 2", answer:"6", options:["6","5","3","4","2"]
-						},
-						{
-							question:"1 x 1", answer:"1", options:["3","2","1","11","0"]
-						},
-						{
-							question:"3 x 3", answer:"9", options:["33","9","3","6","13"]
-						}
-					]
-				},
-				{
-					level2:
-					[
-						{
-							name: "Level 2 - Speed Up!", speed:1,
-							question:"2 x 2", answer:"4", options:["3","6","12","2","4"]
-						},
-						{
-							question:"6 x 6", answer:"36", options:["16","36","33","46","30"]
-						},
-						{
-							question:"6 x 4", answer:"24", options:["24","36","42","18","30"]
-						},
-						{
-							question:"3 x 4", answer:"12", options:["14","15","18","12","20"]
-						}
-					]
-				},
-				{
-					level3:
-					[
-						{
-							name: "Level 3", speed:-1,
-							question:"4 x 10", answer:"40", options:["40","400","44","14","4"]
-						},
-						{
-							question:"5 x 9", answer:"45", options:["40","55","50","45","60"]
-						},
-						{
-							question:"9 x 7", answer:"63", options:["56","63","81","70","72"]
-						},
-						{
-							question:"8 x 7", answer:"56", options:["49","63","56","51","81"]
-						}
-					]
-				},
-				{
-					level4:
-					[
-						{
-							name: "Level 4 - Speed Up!", speed:1,
-							question:"5 x 10", answer:"50", options:["55","50","5","500","15"]
-						},
-						{
-							question:"8 x 8", answer:"64", options:["81","74","64","56","72"]
-						},
-						{
-							question:"6 x 7", answer:"42", options:["24","36","35","42","49"]
-						},
-						{
-							question:"9 x 6", answer:"54", options:["54","56","49","48","64"]
-						}
-					]
-				},
-				{
-					level5:
-					[
-						{
-							name: "Level 5", speed:-1,
-							question:"4 x 12", answer:"48", options:["60","44","46","50","48"]
-						},
-						{
-							question:"12 x 10", answer:"120", options:["122","120","20","80","144"]
-						},
-						{
-							question:"9 x 11", answer:"99", options:["99","81","98","111","89"]
-						},
-						{
-							question:"12 x 6", answer:"72", options:["48","64","72","81","74"]
-						}
-					]
-				},
-				{
-					level6:
-					[
-						{
-							name: "Level 6 - Faster!", speed:1,
-							question:"11 x 12", answer:"132", options:["134","121","132","122","112"]
-						},
-						{
-							question:"10 x 10", answer:"100", options:["100","1111","120","110","10"]
-						},
-						{
-							question:"2 x 9", answer:"18", options:["81","18","16","36","14"]
-						},
-						{
-							question:"3 x 9", answer:"27", options:["21","29","28","27","31"]
-						}
-					]
-				},
-				{
-					level7:
-					[
-						{
-							name: "Level 7 - Keep It Up", speed:1,
-							question:"12 x 12", answer:"144", options:["134","132","144","122","146"]
-						},
-						{
-							question:"1 x 11", answer:"11", options:["11","111","1","10","9"]
-						},
-						{
-							question:"4 x 5", answer:"20", options:["20","25","40","15","30"]
-						},
-						{
-							question:"6 x 8", answer:"48", options:["46","48","28","64","54"]
-						}
-					]
-				},
-				{
-					level8:
-					[
-						{
-							name: "Level 8 - Last One", speed:1,
-							question:"8 x 12", answer:"96", options:["84","96","88","92","108"]
-						},
-						{
-							question:"10 x 7", answer:"70", options:["77","10","7","70","100"]
-						},
-						{
-							question:"8 x 5", answer:"40", options:["55","45","40","35","30"]
-						},
-						{
-							question:"9 x 12", answer:"108", options:["108","106","96","88","84"]
-						}
-					]
-				}
-
-			]
-
-var questions = []; // loaded in loadQuestions
-
 // constants (set in init function)
 var STAGE_WIDTH;
 var STAGE_HEIGHT;
@@ -185,6 +34,7 @@ var questionCounter;
 // text
 var scoreText;
 var questionText, questionLabelText;
+var titleText, descriptionText;
 
 var respawning = false; // used to fix bug and ensure function completes
 
@@ -202,8 +52,6 @@ function init() {
 	stage = new createjs.Stage("gameCanvas"); // canvas id is gameCanvas
 	stage.mouseEventsEnabled = true;
 	stage.enableMouseOver(); // Default, checks the mouse 20 times/second for hovering cursor changes
-
-	loadQuestions();
 
 	// these have to go here otherwise they don't load fast enough (was causing bug where sprite was null)
 	loadBalloonSpriteData("balloon_sprite_blue.png");
@@ -251,6 +99,8 @@ function startGame(event) {
 	// remove start screen from visible canvas
 	//createjs.Tween.get(startText).to({x:-800}, 500).call(initGraphics);
 	stage.removeChild(startScreenImage);
+	stage.removeChild(descriptionText);
+	stage.removeChild(titleText);
 	startButtonImage.x = -300;
 	startButtonPressedImage.x = -300;
 	initGraphics();
@@ -279,18 +129,6 @@ function endGame() {
 		});
 }
 
-/*
- * Loads the questions array with data.
- */
-function loadQuestions() {
-	for (var level of levels) {
-		for (var q of level[Object.keys(level)[0]]) {
-			questions.push(q);
-		}
-	}
-
-	console.log(questions);
-}
 
 /*
  * Adds images to stage and sets initial position
@@ -324,6 +162,24 @@ function initMuteUnmuteButtons() {
 	unmuteButton.on("click", toggleMute);
 
 	stage.addChild(muteButton);
+}
+
+/*
+ * Renders custom start screen text on the start screen.
+ */
+function initStartScreenText() {
+	descriptionText = new createjs.Text(description, '18px Lato', 'black');
+	descriptionText.textAlign = 'center';
+	descriptionText.lineWidth = 560;
+	descriptionText.x = STAGE_WIDTH/2;
+	descriptionText.y = 240;
+	stage.addChild(descriptionText);
+
+	titleText = new createjs.Text(title, '31px Lato', 'white');
+	titleText.maxWidth = 440;
+	titleText.x = STAGE_WIDTH/2 - titleText.getMeasuredWidth()/2;
+	titleText.y = 155;
+	stage.addChild(titleText);
 }
 
 /*
@@ -760,7 +616,7 @@ function updateQuestion() {
 						endGame();
 					} else if (questions[questionCounter].hasOwnProperty("name")) { // new LEVEL
 						displayLevelText(questions[questionCounter].name)
-						BALLOON_SPEED += questions[questionCounter].speed;
+						BALLOON_SPEED += parseInt(questions[questionCounter].speed);
 						nextBackground();
 					}
 
@@ -877,7 +733,7 @@ function setupManifest() {
 			id: "cloud4"
 		},
 		{
-			src: "images/startscreen_multiplication.png",
+			src: "images/startscreen_empty.png",
 			id: "startscreen"
 		},
 		{
@@ -1011,6 +867,7 @@ function loadComplete(event) {
 	stage.addChild(skyImage);
     stage.addChild(backgroundsArray[0]);
     stage.addChild(startScreenImage);
+    initStartScreenText();
     initStartButton();
     stage.update();
 }
